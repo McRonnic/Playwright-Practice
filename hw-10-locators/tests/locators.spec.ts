@@ -7,6 +7,5 @@ test("checkbox", async ({ page }) => {
         await page.locator("input[value='yellow']").check()
         await expect(page.locator("input[value='yellow']")).toBeChecked()
         await expect(page.locator("input[value='cabbage']")).toBeDisabled()
-        await page.pause()
 
 })

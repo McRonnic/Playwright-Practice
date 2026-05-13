@@ -11,3 +11,6 @@ test("checkbox", async ({ page }) => {
 //Там на сайте плашка вылетает: "Tiny MCE is in read-only mode....add a valid payment...",
 //текст вставить не получается
 //Тест написал, как я его себе представляю.
+
+// делается через frameLocator - как-то так  - const frame = page.frameLocator('#mce_0_ifr');
+// await frame.locator('#tinymce > p').fill("Hello from the inside!");  

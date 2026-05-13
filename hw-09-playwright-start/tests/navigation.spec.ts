@@ -11,19 +11,12 @@ test.describe("saucedemo", () => {
                 await expect(page).toHaveTitle('Swag Labs')
         })
 
-
         test("login", async ({ page }) => {
                 await page.fill('#user-name', username)
                 await page.fill('#password', password)
                 await page.click('input[type="submit"]')
-                await expect(page.url()).toContain('/inventory.html')
+                await expect(page.url()).toHaveURL(/.*inventory\.html/)
         })
-
-        // "Создайте файл auth.spec." - зачем??
-
-        // "После клика на Login проверьте, что URL изменился на /inventory.html.
-        // Совет: Вместо того чтобы просто проверять наличие текста, используйте expect(locator).toBeVisible()."
-        // URL должен быть висибл??
 
         test("wronglogin", async ({ page }) => {
                 await page.fill('#user-name', username)
@@ -32,14 +25,9 @@ test.describe("saucedemo", () => {
                 await expect(page.locator('h3')).toContainText('do not match')
         })
 
-
 })
 
 test.describe("demoqa", () => {
-
-        test.afterEach(async ({ page }) => {
-                await page.pause()
-        })
 
         test("checkbox", async({ page }) => {
                 await page.goto('https://demoqa.com/checkbox', { waitUntil: 'domcontentloaded' })
