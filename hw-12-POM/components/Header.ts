@@ -8,11 +8,11 @@ export default class Header{
 
     constructor(page:Page) {
         this.page = page
-        this.cartLocator = ".shopping_cart_link"
+        this.cartLocator = ".shopping_cart_badge"
     }
 
     async itemNum() {
-        return await this.page.textContent('.shopping_cart_badge')
+        return await this.page.textContent(this.cartLocator)
     }
 }
 
