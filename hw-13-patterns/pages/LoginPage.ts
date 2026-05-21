@@ -3,9 +3,9 @@ import { Page, Locator } from '@playwright/test'
 
 
 export default class LoginPage {
-    readonly usernameInput: string;
-    readonly passwordInput: string;
-    readonly loginButtonInput: string;
+    readonly usernameInput: Locator;
+    readonly passwordInput: Locator;
+    readonly loginButtonInput: Locator;
     readonly page: Page;
     readonly errorButton: Locator;
 
@@ -13,9 +13,9 @@ export default class LoginPage {
 
     constructor(page:Page) {
         this.page = page
-        this.usernameInput = '#user-name'
-        this.passwordInput = '#password'
-        this.loginButtonInput =  '#login-button'
+        this.usernameInput = page.locator('#user-name')
+        this.passwordInput = page.locator('#password')
+        this.loginButtonInput = page.locator( '#login-button')
         this.errorButton = page.locator('.error-message-container')
   
     }
@@ -25,9 +25,9 @@ export default class LoginPage {
     }
 
     async login(username:string, password:string): Promise<void> {
-        await this.page.fill(this.usernameInput, username)
-        await this.page.fill( this.passwordInput, password)
-        await this.page.click(this.loginButtonInput)
+        await this.usernameInput.fill(username)
+        await this.passwordInput.fill(password)
+        await this.loginButtonInput.click()
         
     }
 

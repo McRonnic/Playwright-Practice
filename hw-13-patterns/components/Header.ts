@@ -4,15 +4,15 @@ import { Page, Locator } from '@playwright/test'
 
 export default class Header{
     readonly page: Page;
-    readonly cartLocator: string;
+    readonly cartLocator: Locator;
 
     constructor(page:Page) {
         this.page = page
-        this.cartLocator = ".shopping_cart_link"
+        this.cartLocator = page.locator(".shopping_cart_link")
     }
 
     async itemNum() {
-        return await this.page.textContent('.shopping_cart_badge')
+        return await this.cartLocator.textContent()
     }
 }
 
