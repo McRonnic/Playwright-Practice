@@ -45,24 +45,6 @@ jobs:
         name: playwright-report
         path: playwright-report
         retention-days: 10
-
-        # 1. СКАЧИВАЕМ ИСТОРИЮ: Берем файлы из ветки gh-pages, чтобы Allure добавил графики трендов
-    - name: Get Allure history
-      uses: actions/checkout@v4
-      if: always()
-      continue-on-error: true
-      with:
-        ref: gh-pages
-        path: gh-pages
-
-    # 2. ГЕНЕРИРУЕМ ОТЧЕТ: Передаем результаты И историю
-    - name: Generate Allure Report
-      uses: simple-elf/allure-report-action@v1.9
-      if: always()
-      with:
-        allure_results: allure-results
-        allure_history: allure-history
-        keep_reports: 20 # Опционально: хранить историю последних 20 запусков
         
     # Генерируем Allure отчет стабильной версией экшена
     - name: Generate Allure Report
