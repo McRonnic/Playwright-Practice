@@ -47,29 +47,37 @@ jobs:
 
     # --- СЕКЦИЯ ALLURE REPORT ---
 
-    # 1. СКАЧИВАЕМ ИСТОРИЮ: Берем файлы из ветки gh-pages, чтобы Allure добавил графики трендов
-    - name: Get Allure history
+   # 1. Скачиваем историю прошлых запусков из ветки gh-pages в папку allure-results/history
+    - name: Load Allure history
       uses: actions/checkout@v4
       if: always()
       continue-on-error: true
       with:
         ref: gh-pages
-        path: gh-pages
+        path: gh-pages-dir # качаем во временную папку
 
-    # 2. ГЕНЕРИРУЕМ ОТЧЕТ: Передаем результаты И историю
-    - name: Generate Allure Report
-      uses: simple-elf/allure-report-action@v1.9
+    # Переносим историю в правильное место, чтобы Allure её подхватил
+    - name: Copy Allure history
+      if: always()
+      continue-on-error: true
+      run: |
+        mkdir -p allure-results/history
+        cp -r gh-pages-dir/history/* allure-results/history/ || true
+
+    # 2. Генерируем отчет с помощью официального экшена Allure
+    - name: Build Allure Report
+      uses: allure-framework/allure-github-actions@v1
       if: always()
       with:
         allure_results: allure-results
-        allure_history: allure-history
-        keep_reports: 20 # Опционально: хранить историю последних 20 запусков
+        allure_report: allure-report
+        allure_version: 2.32.0 # Используем свежую стабильную версию Allure
 
-    # 3. ДЕПЛОИМ: Публикуем сгенерированную папку на GitHub Pages
+    # 3. Публикуем сгенерированный ГОТОВЫЙ отчет (папку allure-report) в ветку gh-pages
     - name: Deploy Allure to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       if: always()
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
-        publish_dir: allure-history
+        publish_dir: allure-report # Меняем allure-history на allure-report
