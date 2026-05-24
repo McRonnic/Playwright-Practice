@@ -3,7 +3,6 @@ import LoginPage from '../pages/LoginPage.ts'
 import InventoryPage from '../pages/InventoryPage.ts'
 import { Page, Locator } from '@playwright/test'
 
-
 export class ShopFacade {
     private readonly loginPage: LoginPage;
     private readonly inventoryPage: InventoryPage;
@@ -13,10 +12,10 @@ export class ShopFacade {
         this.inventoryPage = new InventoryPage(page);
 
     }
-     async loginAndAddItemToCart(username:string, password:string) {
+    async loginAndAddItemToCart(username: string, password: string) {
         await this.loginPage.navigate()
         await this.loginPage.login(username, password)
         await this.inventoryPage.purchase()
     }
-    
+
 }

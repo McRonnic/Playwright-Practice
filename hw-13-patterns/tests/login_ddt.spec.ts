@@ -15,7 +15,6 @@ for (const attempt of credentials) {
         await loginPage.navigate();
         await loginPage.login(attempt.username, attempt.password)
         await expect(loginPage.errorButton).toContainText(attempt.expectedError);
-
     })
 }
 
