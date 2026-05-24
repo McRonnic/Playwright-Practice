@@ -9,8 +9,8 @@ on:
     # Примечание: GitHub не гарантирует запуск минута в минуту и может стартовать с задержкой.
     - cron: '0 0 * * *' 
     # Даем права пайплайну на запись, чтобы он мог публиковать сайт
-  permissions:
-    contents: write
+permissions:
+  contents: write
 
 jobs:
   test:
