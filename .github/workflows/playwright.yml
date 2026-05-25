@@ -1,4 +1,5 @@
-name: Playwright Tests
+name: Playwright Tests - HW-13 Patterns
+
 on:
   push:
     branches: [ main, master ]
@@ -18,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for Allure history
     
     - uses: actions/setup-node@v4
       with:
@@ -30,26 +33,17 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
       
-    - name: Run Playwright tests
+    - name: Run Playwright tests from hw-13-patterns
+      working-directory: ./hw-13-patterns
       run: npx playwright test
       
-    - name: Upload Playwright Report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: playwright-report
-        path: playwright-report
-        retention-days: 10
-
-    # Install Java (required for Allure)
-    - name: Setup Java
+    - name: Setup Java for Allure
       uses: actions/setup-java@v4
       if: always()
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    # Install Allure without Docker
     - name: Install Allure
       if: always()
       run: |
@@ -57,22 +51,38 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y allure
 
-    - name: Load Allure history
+    - name: Checkout gh-pages branch for history
       uses: actions/checkout@v4
       if: always()
       continue-on-error: true
       with:
         ref: gh-pages
         path: gh-pages
+    
+    - name: Copy previous Allure history
+      if: always()
+      continue-on-error: true
+      run: |
+        mkdir -p ./hw-13-patterns/allure-results/history
+        cp -r gh-pages/history/* ./hw-13-patterns/allure-results/history || true
 
     - name: Generate Allure Report
       if: always()
+      working-directory: ./hw-13-patterns
       run: allure generate --clean -o allure-report allure-results
 
-    - name: Deploy Allure to GitHub Pages
+    - name: Deploy Allure Report to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       if: always()
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_branch: gh-pages
-        publish_dir: allure-report
+        publish_dir: ./hw-13-patterns/allure-report
+        
+    - name: Upload Playwright Report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report-hw13
+        path: ./hw-13-patterns/playwright-report
+        retention-days: 10
