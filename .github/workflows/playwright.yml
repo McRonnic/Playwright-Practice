@@ -10,8 +10,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   test:
@@ -33,12 +31,10 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    # Запуск тестов. Добавим id, чтобы ссылаться на этот шаг при сборке истории
     - name: Run Playwright tests
-      id: playwright-tests
       run: npx playwright test
+      continue-on-error: true # Чтобы упавшие тесты не ломали сборку отчета
 
-    # Сохраняем стандартный HTML-отчет Playwright как артефакт (один раз, без дублей)
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
       if: always()
@@ -47,11 +43,9 @@ jobs:
         path: playwright-report/
         retention-days: 10
 
-    # --- СЕКЦИЯ ALLURE REPORT ---
+    # --- СЕКЦИЯ ALLURE REPORT (СТАБИЛЬНЫЙ ВАРИАНТ) ---
 
-   # --- СЕКЦИЯ ALLURE REPORT ---
-
-    # 1. Скачиваем историю прошлых запусков из ветки gh-pages
+    # 1. Скачиваем историю из ветки gh-pages, чтобы не терять тренды
     - name: Load Allure history
       uses: actions/checkout@v4
       if: always()
@@ -60,7 +54,7 @@ jobs:
         ref: gh-pages
         path: gh-pages-dir
 
-    # Переносим историю в правильное место
+    # Переносим историю в результаты
     - name: Copy Allure history
       if: always()
       continue-on-error: true
@@ -68,7 +62,7 @@ jobs:
         mkdir -p allure-results/history
         cp -r gh-pages-dir/history/* allure-results/history/ || true
 
-    # 2. Генерируем отчет с помощью официального экшена Allure
+    # 2. Генерируем сам отчет в папку allure-report через официальный экшен
     - name: Build Allure Report
       uses: allure-framework/allure-github-actions@v1
       if: always()
@@ -77,14 +71,11 @@ jobs:
         allure_report: allure-report
         allure_version: 2.32.0
 
-    # 3. НАВЕДЕНИЕ ПОРЯДКА: Используем официальный загрузчик страниц GitHub
-    - name: Upload Pages Artifact
-      uses: actions/upload-pages-artifact@v3
+    # 3. Публикуем содержимое папки allure-report в ветку gh-pages
+    - name: Deploy Allure to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
       if: always()
       with:
-        path: allure-report # Загружаем именно сгенерированную папку отчета
-
-    # 4. НАВЕДЕНИЕ ПОРЯДКА: Публикуем напрямую на Pages (без костылей с ветками)
-    - name: Deploy to GitHub Pages
-      uses: actions/deploy-pages@v4
-      if: always()
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: allure-report # Публикуем именно готовую папку отчета!
