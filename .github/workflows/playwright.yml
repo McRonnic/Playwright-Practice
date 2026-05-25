@@ -5,13 +5,14 @@ on:
   pull_request:
     branches: [ main, master ]
   schedule:
-    # Запуск каждый день в полночь. ВНИМАНИЕ: время в cron указывается по UTC!
-    # Примечание: GitHub не гарантирует запуск минута в минуту и может стартовать с задержкой.
+    # Запуск каждый день в полночь по UTC
     - cron: '0 0 * * *' 
 
-# Даем права пайплайну на запись, чтобы он мог публиковать сайт
+# Даем права пайплайну на запись, чтобы он мог публиковать отчеты
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   test:
@@ -20,14 +21,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    # Настраиваем Node.js и кэшируем npm зависимости для ускорения CI
+    # Настраиваем Node.js и кэшируем npm зависимости
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
         cache: 'npm'
         
-    # Установка зависимостей. 
-    # ВНИМАНИЕ: Если шаг падает, убедитесь, что вы закоммитили файл package-lock.json!
+    # Установка зависимостей
     - name: Install dependencies
       run: npm ci
       
@@ -37,7 +37,7 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test
       
-    # Сохраняем базовый HTML-отчет
+    # Сохраняем базовый HTML-отчет Playwright
     - name: Upload Playwright Report
       uses: actions/upload-artifact@v4
       if: always()
@@ -46,13 +46,23 @@ jobs:
         path: playwright-report
         retention-days: 10
 
-    # Генерируем Allure отчет стабильной версией экшена
+    # Получаем историю предыдущих тестов для Allure, чтобы графики не сбрасывались
+    - name: Load Allure history
+      uses: actions/checkout@v4
+      if: always()
+      continue-on-error: true
+      with:
+        ref: gh-pages
+        path: gh-pages
+
+    # Генерируем Allure отчет актуальной Node-версией (без проблемного Docker)
     - name: Generate Allure Report
-      uses: simple-elf/allure-report-action@v1.9
+      uses: simple-elf/allure-report-action@v1.11
       if: always()
       with:
         allure_results: allure-results
         allure_history: allure-history
+        keep_reports: 20
 
     # Публикуем статичный сайт на GitHub Pages
     - name: Deploy Allure to GitHub Pages
