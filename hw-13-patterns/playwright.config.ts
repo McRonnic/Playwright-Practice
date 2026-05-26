@@ -45,7 +45,7 @@ export default defineConfig({
        Это самый правильный подход для экономии места на сервере. */
 
     trace: 'on-first-retry',
-    headless: false
+    headless: true
   },
 
   /* Configure projects for major browsers */
