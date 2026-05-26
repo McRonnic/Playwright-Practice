@@ -46,8 +46,7 @@ jobs:
 
     - name: Install Allure
       if: always()
-      run: |
-        run: npm install -g allure-commandline
+      run: npm install -g allure-commandline
 
     - name: Checkout gh-pages branch for history
       uses: actions/checkout@v4
