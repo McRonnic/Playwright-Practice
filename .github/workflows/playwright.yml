@@ -69,7 +69,7 @@ jobs:
     - name: Generate Allure Report
       if: always()
       working-directory: ./hw-13-patterns
-      run: allure generate --clean -o allure-report allure-results
+      run: npx allure generate ./allure-results --clean -o allure-report
 
     - name: Deploy Allure Report to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
